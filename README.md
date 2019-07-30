@@ -89,6 +89,16 @@ There were 2 failed login attempts since the last successful login.
 
 See this --> `There were 2 failed login attempts since the last successful login.`? That means I was dumb and forgot my password. Twice. Don't be like me.
 
+## Clone this repo
+
+To follow along with the rest of the tutorial, you'll need to clone this repository into your home directory on Sherlock. This can be done with the following command:
+
+```
+$ git clone https://github.com/FordyceLab/sherlock_tutorial.git 
+```
+
+which will create a directory called `sherlock_tutorial` in your home directory.
+
 ## Preparing a job for submission
 
 Alrighty, moving on. Now that we're here, let's compute! We're all [computational geniuses](https://media.giphy.com/media/3o6ZsWTFIZwuEbv2nK/giphy.gif) after all, right?
@@ -109,11 +119,31 @@ To submit a job to the cluster, we first have to make a submission script.
 module load biology
 module load bwa
 
-bwa mem e_coli.fasta.gz e_coli_miseq_R1.fastq.gz e_coli_miseq_R2.fastq.gz > e_coli_aligned.sam
+bwa mem sherlock_tutorial/e_coli.fasta.gz sherlock_tutorial/e_coli_miseq_R1.fastq.gz sherlock_tutorial/e_coli_miseq_R2.fastq.gz > e_coli_aligned.sam
 ```
 
-We can then submit this script by running the command below:
+I'll now hold your hand and take you through this script one line at a time.
+
+1. `#!/bin/bash` - The shebang. It tells the script which executable to use when running.
+2. `#SBATCH --job-name=e_coli_alignment` - Gives your job a name.
+3. `#SBATCH --time=20:00` - Sets a time limit for the job (max 48hrs).
+4. `#SBATCH --ntasks=1` - Number of tasks in the batch.
+5. `#SBATCH --cpus-per-task=1` - Number of CPUs to request.
+6. `#SBATCH --mem-per-cpu=4G` - Amount of memory to request per CPU.
+7. `module load biology` - Load the `biology` module. Must be loaded before BWA.
+8. `module load biology` - Load the `bwa` module.
+9. `bwa mem sherlock_tutorial/e_coli.fasta.gz sherlock_tutorial/e_coli_miseq_R1.fastq.gz sherlock_tutorial/e_coli_miseq_R2.fastq.gz > e_coli_aligned.sam` - Perform the alignment
+
+If we copy pasta this script into a file called `align.sh` in our home directory, we can then submit this script by running the command below:
 
 ```
-$ sbatch submit.sh
+$ sbatch align.sh
 ````
+
+You can check to make sure the job has run by typing:
+
+```
+squeue -u $USER
+```
+
+And boom, done. You should now have a file in your home directory called `e_coli_aligned.sam` with your aligned reads. Slurm will also produce a `.out` file with the `stdout` trace from your run.
